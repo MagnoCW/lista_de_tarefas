@@ -4,7 +4,10 @@ import 'package:lista_de_tarefas/tarefas_widget.dart';
 
 class TarefasConcluidas extends StatelessWidget {
   final TaskController taskController;
-  final Function(int, int) onReorder;
+  final Function(
+    int,
+    int,
+  ) onReorder;
   final Function(int, List<String>) onDelete;
   final Function(String, List<String>) onAdd;
   final Function(int, List<String>, List<String>) onListExchange;
@@ -25,7 +28,6 @@ class TarefasConcluidas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TarefasWidget(
-      titulo: 'Tarefas Concluídas',
       corTitulo: const Color(0xFF388E3C), // Cor verde
       corIconeLixeira: Colors.red,
       tarefasOrigem: taskController.tarefasConcluidas,

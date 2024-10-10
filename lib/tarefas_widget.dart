@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class TarefasWidget extends StatelessWidget {
-  final String titulo;
   final Color corTitulo;
   final Color corIconeLixeira;
   final List<String> tarefasOrigem;
   final List<String> tarefasDestino;
-  final Function(int, int) onReorder;
+  final Function(
+    int,
+    int,
+  ) onReorder;
   final Icon iconCheckBox;
   final Function(int, List<String>) onDelete;
   final Function(String, List<String>) onAdd;
@@ -16,7 +18,6 @@ class TarefasWidget extends StatelessWidget {
 
   const TarefasWidget({
     super.key,
-    required this.titulo,
     required this.corTitulo,
     required this.corIconeLixeira,
     required this.tarefasOrigem,
@@ -35,14 +36,6 @@ class TarefasWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          titulo,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: corTitulo,
-          ),
-        ),
         Expanded(
           child: ReorderableListView(
             onReorder: onReorder,

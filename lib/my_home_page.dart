@@ -25,10 +25,18 @@ class _MyHomePageState extends State<MyHomePage>
     _reset();
   }
 
-  void _reordenarTarefa(int oldIndex, int newIndex) {
+  void _reordenarTarefaNaoConcluida(int oldIndex, int newIndex) {
     setState(() {
       _taskController.reordenarTarefa(
           oldIndex, newIndex, _taskController.tarefasNaoConcluidas);
+    });
+    _taskController.salvarArquivo();
+  }
+
+  void _reordenarTarefaConcluida(int oldIndex, int newIndex) {
+    setState(() {
+      _taskController.reordenarTarefa(
+          oldIndex, newIndex, _taskController.tarefasConcluidas);
     });
     _taskController.salvarArquivo();
   }
@@ -61,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage>
     _taskController.editingIndex = null;
   }
 
-  void _mostrarDialogo(BuildContext context, List<String> lista1) {
+  void _mostrarDialogo(BuildContext context, List<String> lista) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -81,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage>
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  _adicionarTarefa(_editingController.text, lista1);
+                  _adicionarTarefa(_editingController.text, lista);
                   Navigator.pop(context);
                 },
                 child: const Text('Salvar'),
@@ -128,19 +136,39 @@ class _MyHomePageState extends State<MyHomePage>
           ),
         ),
         bottom: TabBar(
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicator: BoxDecoration(
+              color: Colors.grey[850], // Cor de fundo da aba ativa
+              borderRadius: BorderRadius.circular(10), // Borda arredondada
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black54, // Cor da sombra
+                  offset: Offset(2, 2), // Posição da sombra
+                  blurRadius: 4, // Intesidade do blur da sombra
+                ),
+              ],
+            ),
             indicatorColor: Colors.white,
             controller: _tabController,
             tabs: const <Widget>[
               Tab(
-                icon: Icon(
-                  Icons.radio_button_unchecked,
-                  color: Color(0xFFD32F2F),
+                child: Text(
+                  'Tarefas Não Concluídas',
+                  style: TextStyle(
+                      color: Color(0xFFFF5252),
+                      fontSize: 18,
+                      fontWeight:
+                          FontWeight.bold), // Cor personalizada para esta aba
                 ),
               ),
               Tab(
-                icon: Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF388E3C),
+                child: Text(
+                  'Tarefas Concluídas',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 0, 204, 10),
+                      fontSize: 18,
+                      fontWeight:
+                          FontWeight.bold), // Cor personalizada para esta aba
                 ),
               ),
             ]),
@@ -150,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage>
         children: [
           TarefasNaoConcluidas(
             taskController: _taskController,
-            onReorder: _reordenarTarefa,
+            onReorder: _reordenarTarefaNaoConcluida,
             onDelete: _deletarTarefa,
             onAdd: _adicionarTarefa,
             onListExchange: _trocarTarefaDeLista,
@@ -159,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage>
           ),
           TarefasConcluidas(
             taskController: _taskController,
-            onReorder: _reordenarTarefa,
+            onReorder: _reordenarTarefaConcluida,
             onDelete: _deletarTarefa,
             onAdd: _adicionarTarefa,
             onListExchange: _trocarTarefaDeLista,

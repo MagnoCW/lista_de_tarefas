@@ -4,7 +4,10 @@ import 'package:lista_de_tarefas/tarefas_widget.dart';
 
 class TarefasNaoConcluidas extends StatelessWidget {
   final TaskController taskController;
-  final Function(int, int) onReorder;
+  final Function(
+    int,
+    int,
+  ) onReorder;
   final Function(int, List<String>) onDelete;
   final Function(String, List<String>) onAdd;
   final Function(int, List<String>, List<String>) onListExchange;
@@ -25,7 +28,6 @@ class TarefasNaoConcluidas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TarefasWidget(
-      titulo: 'Tarefas Não Concluídas',
       corTitulo: const Color(0xFFD32F2F), // Cor vermelha
       corIconeLixeira: Colors.red,
       tarefasOrigem: taskController.tarefasNaoConcluidas,
