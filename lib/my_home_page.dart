@@ -13,47 +13,46 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final TextEditingController _editingController = TextEditingController();
 
   final TaskController _taskController = TaskController();
 
-  void _adicionarTarefa(String novaTarefa, List<String> lista) {
+  void _adicionarTarefa(String novaTarefa, List<String> lista) async {
     setState(() {
       _taskController.adicionarTarefa(novaTarefa, lista);
     });
-    _taskController.salvarArquivo();
+    await _taskController.salvarArquivo();
     _reset();
   }
 
-  void _reordenarTarefaNaoConcluida(int oldIndex, int newIndex) {
+  void _reordenarTarefaNaoConcluida(int oldIndex, int newIndex) async {
     setState(() {
       _taskController.reordenarTarefa(
           oldIndex, newIndex, _taskController.tarefasNaoConcluidas);
     });
-    _taskController.salvarArquivo();
+    await _taskController.salvarArquivo();
   }
 
-  void _reordenarTarefaConcluida(int oldIndex, int newIndex) {
+  void _reordenarTarefaConcluida(int oldIndex, int newIndex) async {
     setState(() {
       _taskController.reordenarTarefa(
           oldIndex, newIndex, _taskController.tarefasConcluidas);
     });
-    _taskController.salvarArquivo();
+    await _taskController.salvarArquivo();
   }
 
-  void _deletarTarefa(int index, List<String> lista) {
+  void _deletarTarefa(int index, List<String> lista) async {
     setState(() {
       _taskController.deletarTarefa(index, lista);
     });
-    _taskController.salvarArquivo();
+    await _taskController.salvarArquivo();
   }
 
   void _trocarTarefaDeLista(
-      int index, List<String> origem, List<String> destino) {
+      int index, List<String> origem, List<String> destino) async {
     setState(() {
       _taskController.trocarTarefaDeLista(index, origem, destino);
     });
-    _taskController.salvarArquivo();
+    await _taskController.salvarArquivo();
   }
 
   void _editarTarefa(int index, List<String> lista, String novaTarefa) {
@@ -63,10 +62,16 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _reset() {
-    _editingController.clear();
+    _taskController.editingController.clear();
     _taskController.labelText = 'Digite a nova tarefa';
     _taskController.alertDialogTitle = 'Adicionar Tarefa';
     _taskController.editingIndex = null;
+  }
+
+  void _atualizarLerArquivo(List<String> lista1) {
+    setState(() {
+      _taskController.tarefasNaoConcluidas = lista1;
+    });
   }
 
   void _mostrarDialogo(BuildContext context, List<String> lista) {
@@ -81,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage>
           child: AlertDialog(
             title: Text(_taskController.alertDialogTitle),
             content: TextField(
-                controller: _editingController,
+                controller: _taskController.editingController,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   labelText: _taskController.labelText,
@@ -89,7 +94,8 @@ class _MyHomePageState extends State<MyHomePage>
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  _adicionarTarefa(_editingController.text, lista);
+                  _adicionarTarefa(
+                      _taskController.editingController.text, lista);
                   Navigator.pop(context);
                 },
                 child: const Text('Salvar'),
@@ -119,6 +125,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+    _taskController.lerArquivo(_atualizarLerArquivo);
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -153,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage>
             tabs: const <Widget>[
               Tab(
                 child: Text(
-                  'Tarefas Não Concluídas',
+                  'Não Concluídas',
                   style: TextStyle(
                       color: Color(0xFFFF5252),
                       fontSize: 18,
@@ -163,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage>
               ),
               Tab(
                 child: Text(
-                  'Tarefas Concluídas',
+                  'Concluídas',
                   style: TextStyle(
                       color: Color.fromARGB(255, 0, 204, 10),
                       fontSize: 18,

@@ -1,50 +1,47 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskController {
   List<String> tarefasNaoConcluidas = [];
   List<String> tarefasConcluidas = [];
+  final TextEditingController editingController = TextEditingController();
   int? editingIndex;
   String labelText = 'Digite a nova tarefa';
   String alertDialogTitle = 'Adicionar Tarefa';
-
-  Future<File> _getFile() async {
-    final diretorio = await getApplicationDocumentsDirectory();
-    return File("${diretorio.path}/dados.json");
-  }
 
   Future<void> salvarArquivo() async {
     try {
       Map<String, List<String>> dados = {
         "tarefas_nao_concluidas": tarefasNaoConcluidas,
-        "tarefas_concluidas": tarefasConcluidas
+        "tarefas_concluidas": tarefasConcluidas,
       };
 
       String jsonDados = jsonEncode(dados);
-      var arquivo = await _getFile();
-      await arquivo.writeAsString(jsonDados);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('dados_tarefas', jsonDados);
     } catch (e) {
-      print("Erro ao salvar o arquivo: $e");
+      print("Erro ao salvar as tarefas: $e");
     }
   }
 
-  Future<void> lerArquivo() async {
+  Future<void> lerArquivo(Function(List<String>) callback) async {
     try {
-      final arquivo = await _getFile();
-      if (await arquivo.exists()) {
-        final dados = await arquivo.readAsString();
-        final jsonMap = jsonDecode(dados);
+      final prefs = await SharedPreferences.getInstance();
+      String? jsonDados = prefs.getString('dados_tarefas');
 
+      if (jsonDados != null) {
+        final jsonMap = jsonDecode(jsonDados);
         tarefasNaoConcluidas =
             List<String>.from(jsonMap['tarefas_nao_concluidas']);
         tarefasConcluidas = List<String>.from(jsonMap['tarefas_concluidas']);
+        callback(tarefasNaoConcluidas);
       } else {
-        print("Arquivo não encontrado");
+        print("Nenhuma tarefa encontrada.");
       }
     } catch (e) {
-      print("Erro ao ler o arquivo: $e");
+      print("Erro ao ler as tarefas: $e");
     }
   }
 
@@ -77,7 +74,7 @@ class TaskController {
   void editarTarefa(int index, List<String> lista, String novaTarefa) {
     labelText = 'Editando a tarefa';
     alertDialogTitle = 'Editar Tarefa';
-    novaTarefa = lista[index];
+    editingController.text = lista[index];
     editingIndex = index;
   }
 }
